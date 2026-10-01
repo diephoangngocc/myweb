@@ -1,0 +1,4 @@
+/* Đầu vào cho Tailwind CLI → biên dịch ra public/css/tailwind.css (npm run build) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

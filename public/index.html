@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planner 2026 · Bộ 4 Sheets & Tài chính</title>
+  <meta name="description" content="Planner cá nhân: MỤC TIÊU → HÀNH ĐỘNG → KẾT QUẢ trong 90 ngày.">
+  <meta name="theme-color" content="#E6EFFD">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <!--
+    Thứ tự CSS quan trọng: style.css trước, tailwind.css sau
+    (tailwind.css được biên dịch từ src/tailwind.css bằng `npm run build`).
+  -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/tailwind.css">
+  <!-- Chart.js 4.4.1 (MIT) — tự host, không phụ thuộc CDN -->
+  <script src="js/vendor/chart.umd.js" defer></script>
+</head>
+<body class="font-serif is-booting">
+  <noscript><div class="noscript">Ứng dụng cần bật JavaScript để hoạt động.</div></noscript>
+
+  <div id="sbOverlay" class="sb-overlay" data-action="sidebar-close"></div>
+  <!-- Vùng cảm ứng mép trái + tab kéo (chế độ menu tự ẩn) -->
+  <div id="sbEdge" class="sb-edge" aria-hidden="true"></div>
+  <button id="sbHandle" class="sb-handle" data-action="sidebar-peek" aria-label="Mở menu" title="Rê chuột để mở menu">
+    <span class="sb-handle-grip"></span><i data-icon="chevR" class="w-4 h-4"></i>
+  </button>
+
+  <div class="app-shell">
+    <!-- ============================ SIDEBAR ============================ -->
+    <aside id="sidebar" class="sidebar" aria-label="Điều hướng chính">
+      <div class="sb-brand">
+        <div class="logo-tile"><i data-icon="check" class="w-6 h-6"></i></div>
+        <div class="sb-label">
+          <div class="brand-name">Planner 2026</div>
+          <div class="brand-sub" id="brandSub">Bộ 4 Sheets · 90 ngày</div>
+        </div>
+      </div>
+
+      <nav class="sb-nav">
+        <div class="nav-group" data-group="planner">
+          <button class="nav-group-title sb-label" data-action="section" data-section="planner" title="Chuyển sang Planner"><i data-icon="dashboard" class="w-3.5 h-3.5"></i><span>Planner · Bộ 4 Sheets</span><i data-icon="chevD" class="ngt-chev"></i></button>
+          <div class="nav-items"><div>
+          <a class="nav-item" href="#dashboard" data-nav="dashboard" title="Tổng quan">
+            <span class="nav-ico"><i data-icon="dashboard"></i></span><span class="sb-label">Tổng quan</span>
+          </a>
+          <a class="nav-item" href="#goals" data-nav="goals" title="Mục tiêu">
+            <span class="nav-ico"><i data-icon="target"></i></span><span class="sb-label">Mục tiêu</span><span class="nav-num">01</span>
+          </a>
+          <a class="nav-item" href="#habits" data-nav="habits" title="Thói quen">
+            <span class="nav-ico"><i data-icon="repeat"></i></span><span class="sb-label">Thói quen</span><span class="nav-num">02</span>
+          </a>
+          <a class="nav-item" href="#weekly" data-nav="weekly" title="Kế hoạch tuần">
+            <span class="nav-ico"><i data-icon="week"></i></span><span class="sb-label">Kế hoạch tuần</span><span class="nav-num">03</span>
+          </a>
+          <a class="nav-item" href="#year" data-nav="year" title="Toàn năm">
+            <span class="nav-ico"><i data-icon="calendar"></i></span><span class="sb-label">Toàn năm</span><span class="nav-num">04</span>
+          </a>
+          </div></div>
+        </div>
+        <div class="nav-group" data-group="finance">
+          <button class="nav-group-title sb-label" data-action="section" data-section="finance" title="Chuyển sang Tài chính"><i data-icon="wallet" class="w-3.5 h-3.5"></i><span>Tài chính</span><i data-icon="chevD" class="ngt-chev"></i></button>
+          <div class="nav-items"><div>
+          <a class="nav-item fin" href="#finance" data-nav="finance" title="Tổng quan tài chính">
+            <span class="nav-ico"><i data-icon="pie"></i></span><span class="sb-label">Tổng quan</span><span class="nav-num">A</span>
+          </a>
+          <a class="nav-item fin" href="#transactions" data-nav="transactions" title="Sổ giao dịch">
+            <span class="nav-ico"><i data-icon="receipt"></i></span><span class="sb-label">Sổ giao dịch</span><span class="nav-num">B</span>
+          </a>
+          <a class="nav-item fin" href="#budget" data-nav="budget" title="Ngân sách tháng">
+            <span class="nav-ico"><i data-icon="target"></i></span><span class="sb-label">Ngân sách</span><span class="nav-num">C</span>
+          </a>
+          <a class="nav-item fin" href="#debts" data-nav="debts" title="Khoản vay &amp; nợ">
+            <span class="nav-ico"><i data-icon="creditCard"></i></span><span class="sb-label">Khoản nợ</span><span class="nav-num">D</span>
+          </a>
+          <a class="nav-item fin" href="#funds" data-nav="funds" title="Tiết kiệm">
+            <span class="nav-ico"><i data-icon="piggy"></i></span><span class="sb-label">Tiết kiệm</span><span class="nav-num">E</span>
+          </a>
+          <a class="nav-item fin" href="#bills" data-nav="bills" title="Hóa đơn định kỳ">
+            <span class="nav-ico"><i data-icon="zap"></i></span><span class="sb-label">Hóa đơn định kỳ</span><span class="nav-num">F</span>
+          </a>
+          </div></div>
+        </div>
+      </nav>
+
+      <div class="sb-divider"></div>
+      <div class="sb-section-title sb-label">Dữ liệu &amp; đồng bộ</div>
+      <div class="sb-tools">
+        <button class="tool-btn" data-action="sync-history" title="Lịch sử đồng bộ"><i data-icon="history"></i><span class="sb-label">Lịch sử đồng bộ</span></button>
+        <button class="tool-btn" data-action="load-sample" title="Tải dữ liệu mẫu"><i data-icon="sparkles"></i><span class="sb-label">Tải dữ liệu mẫu</span></button>
+        <button class="tool-btn" data-action="export-json" title="Sao lưu (JSON)"><i data-icon="download"></i><span class="sb-label">Sao lưu (JSON)</span></button>
+        <button class="tool-btn" data-action="import-json" title="Khôi phục từ JSON"><i data-icon="upload"></i><span class="sb-label">Khôi phục từ JSON</span></button>
+        <button class="tool-btn danger" data-action="clear-data" title="Xóa sạch dữ liệu"><i data-icon="trash"></i><span class="sb-label">Xóa sạch dữ liệu</span></button>
+      </div>
+
+      <div class="sb-spacer"></div>
+      <div id="cycleCard" class="cycle-card"></div>
+      <button class="sb-collapse" id="sbPinBtn" data-action="sidebar-pin" title="Ghim / tự ẩn menu"></button>
+    </aside>
+
+    <!-- ============================ MAIN ============================ -->
+    <div class="main-wrap">
+      <div class="main-panel">
+        <header class="topbar">
+          <button class="icon-btn menu-btn" data-action="sidebar-open" aria-label="Mở menu"><i data-icon="menu"></i></button>
+
+          <div class="search-wrap">
+            <i data-icon="search"></i>
+            <input id="searchInput" class="search-input" placeholder="Tìm mục tiêu, giao dịch, quỹ, hoá đơn..." autocomplete="off" aria-label="Tìm kiếm">
+            <kbd>/</kbd>
+            <div id="searchResults" class="dropdown hidden"></div>
+          </div>
+
+          <div class="main-switch" role="tablist" aria-label="Chọn phân vùng">
+            <button role="tab" data-action="section" data-section="planner" title="Planner — Bộ 4 Sheets"><i data-icon="dashboard" class="w-4 h-4"></i><span>Planner</span></button>
+            <button role="tab" data-action="section" data-section="finance" title="Tài chính"><i data-icon="wallet" class="w-4 h-4"></i><span>Tài chính</span></button>
+          </div>
+
+          <div class="flex-1"></div>
+
+          <button id="saveStatus" class="save-status muted" data-action="sync-panel" title="Trạng thái đồng bộ — bấm để xem chi tiết">
+            <i data-icon="refresh" class="w-4 h-4"></i><span>Đang kết nối…</span>
+          </button>
+
+          <div class="relative bell-wrap">
+            <button class="icon-btn" data-action="bell-toggle" aria-label="Thông báo">
+              <i data-icon="bell"></i><span id="bellBadge" class="badge hidden">0</span>
+            </button>
+            <div id="bellMenu" class="dropdown bell-menu hidden"></div>
+          </div>
+
+          <div class="profile">
+            <div id="avatar" class="avatar">D</div>
+            <div class="hidden sm:block min-w-0">
+              <div id="profileName" class="profile-name editable" contenteditable="true" spellcheck="false" data-single data-path="profile.name" data-placeholder="Tên của bạn"></div>
+              <div id="profileSub" class="profile-sub editable" contenteditable="true" spellcheck="false" data-single data-path="profile.subtitle" data-placeholder="Vai trò / khẩu hiệu"></div>
+            </div>
+          </div>
+        </header>
+
+        <main id="main">
+          <section id="view-dashboard" class="view" data-view="dashboard"></section>
+          <section id="view-goals" class="view" data-view="goals"></section>
+          <section id="view-habits" class="view" data-view="habits"></section>
+          <section id="view-weekly" class="view" data-view="weekly"></section>
+          <section id="view-year" class="view" data-view="year"></section>
+          <section id="view-finance" class="view" data-view="finance"></section>
+          <section id="view-transactions" class="view" data-view="transactions"></section>
+          <section id="view-budget" class="view" data-view="budget"></section>
+          <section id="view-debts" class="view" data-view="debts"></section>
+          <section id="view-funds" class="view" data-view="funds"></section>
+          <section id="view-bills" class="view" data-view="bills"></section>
+        </main>
+
+        <footer class="app-footer">
+          Bộ 4 Sheets 2026 · MỤC TIÊU → HÀNH ĐỘNG → KẾT QUẢ · Smart Financial &amp; Fan Tracker · Tự lưu trên máy và đồng bộ giữa các thiết bị
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalRoot"></div>
+  <div id="toastRoot" class="toast-root" aria-live="polite"></div>
+  <input type="file" id="fileImage" accept="image/*" hidden>
+  <input type="file" id="fileJson" accept="application/json,.json" hidden>
+
+  <!-- Mã nguồn ứng dụng (thứ tự quan trọng) -->
+  <script src="js/core.js" defer></script>
+  <script src="js/sync.js" defer></script>
+  <script src="js/sample-data.js" defer></script>
+  <script src="js/goals.js" defer></script>
+  <script src="js/habits.js" defer></script>
+  <script src="js/weekly.js" defer></script>
+  <script src="js/year.js" defer></script>
+  <script src="js/dashboard.js" defer></script>
+  <script src="js/finance.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>
