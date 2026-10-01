@@ -1,5 +1,5 @@
 // Server chạy thử trên máy: phục vụ public/ + /api/state (giống Vercel) — `npm run dev`
-// Đồng bộ chỉ hoạt động khi có KV_REST_API_URL và KV_REST_API_TOKEN (đặt trong .env.local
+// Đồng bộ chỉ hoạt động khi có REDIS_URL hoặc KV_REST_API_URL + KV_REST_API_TOKEN (đặt trong .env.local
 // hoặc lấy về bằng `vercel env pull .env.local`). Không có thì app tự chạy chế độ "chỉ lưu trên máy".
 import { createServer } from 'node:http';
 import { readFileSync, existsSync, statSync } from 'node:fs';
@@ -50,6 +50,6 @@ const server = createServer(async (req, res) => {
 
 const port = Number(process.env.PORT || 3000);
 server.listen(port, () => {
-  const synced = !!(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL);
-  console.log(`Planner 2026 → http://localhost:${port}  (${synced ? 'đồng bộ: BẬT' : 'đồng bộ: TẮT — thiếu biến môi trường KV_REST_API_*'})`);
+  const synced = Object.entries(process.env).some(([k, v]) => /(^|_)(KV_REST_API_URL|UPSTASH_REDIS_REST_URL)$/.test(k) || (/(^|_)(REDIS_URL|KV_URL)$/.test(k) && /^rediss?:\/\//.test(v || '')));
+  console.log(`Planner 2026 → http://localhost:${port}  (${synced ? 'đồng bộ: BẬT' : 'đồng bộ: TẮT — thiếu REDIS_URL hoặc KV_REST_API_*'})`);
 });

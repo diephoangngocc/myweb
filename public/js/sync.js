@@ -366,7 +366,7 @@ const Sync = {
       await UI.modal({
         title: 'Chỉ lưu trên máy này', icon: 'cloudOff', okText: 'Đã hiểu', cancelText: 'Đóng',
         bodyHTML: `<p>${esc(this.reason || 'Chưa kết nối được máy chủ đồng bộ.')}</p>
-          <p class="muted">Để đồng bộ giữa các thiết bị: deploy lên Vercel và thêm cơ sở dữ liệu <b>Upstash for Redis</b> (Storage → Create Database) cho project, rồi deploy lại. Chi tiết trong README.</p>`,
+          <p class="muted">Để đồng bộ giữa các thiết bị: deploy lên Vercel và thêm cơ sở dữ liệu <b>Redis</b> hoặc <b>Upstash for Redis</b> (Storage → Create Database) cho project, rồi deploy lại. Chi tiết trong README.</p>`,
       });
       return;
     }

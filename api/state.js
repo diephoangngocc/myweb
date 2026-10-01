@@ -12,8 +12,10 @@
  *   POST /api/state?restore=N    → { rev, updatedAt, device, state }        (khôi phục phiên bản N trong lịch sử)
  *   POST /api/state?archive=1    ← { state, device } → { ok: true }        (cất một bản vào lịch sử, không đổi dữ liệu chính)
  *
- * Biến môi trường (Vercel tự thêm khi cài "Upstash for Redis" từ Marketplace):
- *   KV_REST_API_URL, KV_REST_API_TOKEN   (hoặc UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN)
+ * Biến môi trường — dùng được 1 trong 2 loại cơ sở dữ liệu trên Vercel Marketplace (Storage):
+ *   • Upstash for Redis : KV_REST_API_URL + KV_REST_API_TOKEN  (hoặc UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN)
+ *   • Redis (Redis Cloud): REDIS_URL = redis://… hoặc rediss://…   (kết nối TCP bằng thư viện `redis`)
+ *   Tên biến có tiền tố tuỳ chỉnh (vd STORAGE_REDIS_URL) cũng được nhận.
  * =====================================================================
  */
 
@@ -48,13 +50,56 @@ redis.call('HSET', KEYS[1], 'rev', nrev, 'data', ARGV[2], 'updatedAt', ARGV[3], 
 return {1, nrev}
 `;
 
+function envKey(name, test = v => !!v) {
+  const env = process.env;
+  if (test(env[name])) return name;
+  return Object.keys(env).find(k => k.endsWith('_' + name) && test(env[k])) || null;
+}
+
 function storageConfig() {
-  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-  return url && token ? { url: url.replace(/\/+$/, ''), token } : null;
+  const env = process.env;
+  for (const [u, t] of [['KV_REST_API_URL', 'KV_REST_API_TOKEN'], ['UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN']]) {
+    const uk = envKey(u, v => /^https?:\/\//.test(v || ''));
+    const tk = uk && uk.slice(0, uk.length - u.length) + t;
+    if (uk && env[tk]) return { kind: 'rest', url: env[uk].replace(/\/+$/, ''), token: env[tk] };
+  }
+  for (const n of ['REDIS_URL', 'KV_URL']) {
+    const k = envKey(n, v => /^rediss?:\/\//.test(v || ''));
+    if (k) return { kind: 'tcp', url: env[k] };
+  }
+  return null;
+}
+
+/* ---------- Kết nối TCP (Redis Cloud / REDIS_URL) — giữ lại giữa các lần gọi của cùng một instance ---------- */
+let tcpClient = null;   // Promise<RedisClient>
+function getTcp(url) {
+  if (!tcpClient) {
+    const { createClient } = require('redis');
+    const client = createClient({
+      url,
+      socket: { connectTimeout: 8000, reconnectStrategy: n => (n > 3 ? new Error('Không kết nối lại được Redis') : Math.min(200 * n, 1000)) },
+    });
+    client.on('error', err => console.error('[api/state] redis:', err && err.message));
+    client.on('end', () => { tcpClient = null; });
+    tcpClient = client.connect().then(() => client, err => { tcpClient = null; throw err; });
+  }
+  return tcpClient;
+}
+function withTimeout(promise, ms, label) {
+  let t;
+  return Promise.race([promise, new Promise((_, rej) => { t = setTimeout(() => rej(new Error(label)), ms); })]).finally(() => clearTimeout(t));
 }
 
 async function redis(cfg, command) {
+  if (cfg.kind === 'tcp') {
+    const client = await withTimeout(getTcp(cfg.url), 9000, 'Hết thời gian kết nối Redis');
+    try {
+      return await withTimeout(client.sendCommand(command.map(String)), 9000, 'Redis phản hồi quá chậm');
+    } catch (err) {
+      if (!client.isReady) tcpClient = null;
+      throw err;
+    }
+  }
   const r = await fetch(cfg.url, {
     method: 'POST',
     headers: { Authorization: `Bearer ${cfg.token}`, 'Content-Type': 'application/json' },
@@ -126,7 +171,7 @@ async function save(cfg, { baseRev, data, device, forceSnap }) {
 
 module.exports = async function handler(req, res) {
   const cfg = storageConfig();
-  if (!cfg) return send(res, 503, { error: 'not_configured', message: 'Chưa kết nối cơ sở dữ liệu (thiếu KV_REST_API_URL / KV_REST_API_TOKEN).' });
+  if (!cfg) return send(res, 503, { error: 'not_configured', message: 'Chưa kết nối cơ sở dữ liệu (thiếu REDIS_URL hoặc KV_REST_API_URL + KV_REST_API_TOKEN).' });
 
   const q = req.query || Object.fromEntries(new URL(req.url, 'http://x').searchParams);
   try {

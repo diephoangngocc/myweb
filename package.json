@@ -2,7 +2,7 @@
   "name": "planner-2026",
   "version": "2.0.0",
   "private": true,
-  "description": "Bộ 4 Sheets 2026 — Planner 90 ngày (MỤC TIÊU → HÀNH ĐỘNG → KẾT QUẢ). Static SPA + Vercel Function đồng bộ qua Upstash Redis.",
+  "description": "Bộ 4 Sheets 2026 — Planner 90 ngày (MỤC TIÊU → HÀNH ĐỘNG → KẾT QUẢ). Static SPA + Vercel Function đồng bộ qua Redis (REDIS_URL) hoặc Upstash Redis.",
   "scripts": {
     "build": "tailwindcss -c tailwind.config.js -i ./src/tailwind.css -o ./public/css/tailwind.css --minify",
     "watch": "tailwindcss -c tailwind.config.js -i ./src/tailwind.css -o ./public/css/tailwind.css --watch",
@@ -14,5 +14,8 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "redis": "^4.7.1"
   }
 }
